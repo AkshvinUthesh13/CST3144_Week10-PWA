@@ -1,13 +1,18 @@
 var cacheName = 'petstore-v1'
 var cacheFiles =[
-    'index.html',
+    'petDepot.html',
     'products.js',
-    'petstore.webmanifest',
-    'images/yarn.jpg',
+    'petStore1.webmanifest',
     'images/cat-litter.jpg',
-    'images/laser-pointer.jpg',
-    'images/cat-house.jpg',
-    'images/icon-store-512.jpg',
+    'images/cat-toy.jpg',
+    'images/dog-food.jpg',
+    'images/dog-shampoo.png',
+    'images/pet-carrier.jpg',
+    'images/dog-treats.png',
+    'images/fullsize-product1.jpg',
+    'images/product-fullsize.png',
+    'images/scratching-post.jpg',
+    'images/icon-store-512.png',
 
 ];
 
