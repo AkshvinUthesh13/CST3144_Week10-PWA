@@ -1,0 +1,297 @@
+<html>
+
+</html>
+
+<head>
+    <title>Vue.js Pet Depot</title>
+    <script src="products.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="manifest" href="petStore1.webmanifest">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .product{
+            border:1px grey solid;
+            padding: 20px;
+            margin: 20px;
+            text-align:center;
+        }
+
+        #app {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+            background-color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.8em;
+        }
+
+        header button {
+            background-color: #ff8c00;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        header button:hover {
+            background-color: #ff7b00;
+        }
+
+        main {
+            padding: 20px;
+            text-align: center;
+        }
+
+        figure {
+            max-width: 100%;
+            margin: auto;
+        }
+
+        figure img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button[disabled] {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        button:hover:not([disabled]) {
+            background-color: #218838;
+        }
+    </style>
+    <script>
+        if('serviceWorker' in navigator){
+            navigator.serviceWorker.register('service-worker.js')
+        }
+    </script>
+</head>
+
+<body>
+    <div id="app">
+        <header>
+            <h1 v-text="sitename"></h1>
+            <button v-on:click="showCheckout">
+                <!-- 'cartItemCount' is used the same way as a data property. -->
+                {{ cartItemCount }}
+                <!-- add the cart icon -->
+                <span class="fas fa-cart-plus"></span> Checkout
+            </button>
+
+        </header>
+        <main>
+            <div v-if="showProduct">
+                <div class="product" v-for="product in sortedProducts">
+                    <h2 v-text="product.title"></h2>
+                    <figure>
+                        <!-- bind 'src' attr to 'product.image' in 'data' -->
+                        <img v-bind:src="product.image">
+                    </figure>
+                    <p v-text="product.description"></p>
+                    <!-- The double curly brackets is used instead of 'v-text' -->
+                    <p>Price: {{product.price}}</p>
+                    <p>Stock Remaining: {{itemsLeft(product)}}</p>
+                    <button v-on:click="addToCart(product)" v-if="canAddToCart(product)">Add to cart</button>
+                    <button disabled='disabled' v-else>Add to cart</button>
+                    <span v-if='itemsLeft(product) === 0'> All out! </span>
+                    <span v-else-if="itemsLeft(product) < 5">only
+                        {{ itemsLeft(product)}} left</span>
+                    <span v-else>Buy now!</span>
+                    <div>
+                        <span v-for="n in product.rating">★</span>
+                        <span v-for="n in 5 - product.rating">☆</span>
+                    </div>
+                </div>
+
+            </div>
+            <div v-else>
+                <h2>Checkout</h2>
+                <p>
+                    <strong>First Name:</strong>
+                    <!-- This input field is bound to 'firstName' in the 'order' object -->
+                    <input v-model.trim="order.firstName" />
+                </p>
+                <p>
+                    <strong>Last Name:</strong>
+                    <!-- This input field is bound to 'lastName' in the 'order' object -->
+                    <input v-model="order.lastName" />
+                </p>
+                <strong>Address:</strong> <input v-model="order.address" />
+                </p>
+                <p>
+                    <strong>City:</strong> <input v-model="order.city" />
+                </p>
+                <p>
+                    <strong>State:</strong>
+                    <select v-model="order.state" class="form-control">
+                        <option disabled value="">State</option>
+                        <option v-for="(state,key) in states" v-bind:value="state">
+                            {{key}}
+                    </select>
+                </p>
+                <p>
+                    <strong>Zip/Postal Code:</strong> <input v-model.number="order.zip" type="number" />
+                </p>
+                <p><input type="checkbox" id="gift" value="true" v-model="order.gift" v-bind:true-value="order.sendGift"
+                        v-bind:false-value="order.dontSendGift">
+                    <label for="gift">Ship As Gift?</label>
+                </p>
+                <p><input type="radio" id="home" value="Home" v-model="order.method">
+                    <label for="home">Home</label>
+                    <input type="radio" id="business" value="Business" v-model="order.method">
+                    <label for="business">Business</label>
+                </p>
+                <h2>Order Information</h2>
+                <p>First Name: {{order.firstName}}</p>
+                <p>Last Name: {{order.lastName}}</p>
+                <p>Address: {{order.address}}</p>
+                <p>City: {{order.city}}</p>
+                <p>Zip: {{order.zip}}</p>
+                <p>State: {{order.state}}</p>
+                <p>Gift?: {{order.gift}}</p>
+                <p>Method: {{order.method}}</p>
+                <button v-on:click="submitForm">Place Order</button>
+            </div>
+        </main>
+    </div>
+    <script type="text/javascript">
+        let webstore = new Vue({
+            el: '#app',
+            // the key 'sitename' matches the value of 'v-text' earlier
+            data: {
+                sitename: 'Vue.js Pet Depot',
+                showProduct: true,
+                order: {
+                    firstName: '',
+                    lastName: '',
+                    address: '',
+                    city: '',
+                    zip: '',
+                    state: '',
+                    method: 'Home',
+                    gift: '',
+                    sendGift: 'Send as a gift',
+                    dontSendGift: 'Do not send as a gift'
+                },
+                states: {
+                    AL: 'Alabama',
+                    AR: 'Arizona',
+                    CA: 'California',
+                    NV: 'Nevada',
+                },
+                // product: {
+                //         id: 1001,
+                //         title: "Cat Food, 25lb bag",
+                //         description: "A 25 pound bag of <em>irresistible</em>," + "organic goodness for your cat.",
+                //         price: 2000,
+                //         image: "images/product-fullsize.png",
+                //         availableInventory: 10,
+                //         rating:3,
+                //         },
+                products: products,
+                cart: []//array to store items in shopping cart
+
+            },
+            computed: { // the Computed Property object
+                cartItemCount: function () { // the property name
+                    // its value is calculated when it is called
+                    return this.cart.length || "";
+                },
+                sortedProducts() {
+
+                    // the comparison function that defines the order
+                    function compare(a, b) {
+                        if (a.price > b.price) return 1;
+                        if (a.price < b.price) return -1;
+                        return 0;
+                    }
+                    // sort the 'products' array and return it
+                    return this.products.sort(compare);
+                }
+
+            },
+            methods: {
+                addToCart(product) {
+                    this.cart.push(product.id)
+                },
+                showCheckout() {
+                    this.showProduct = !this.showProduct
+                },
+                submitForm() { alert('Order submitted!') },
+                canAddToCart(product) {
+                    return product.availableInventory > this.cartCount(product.id);
+                },
+                itemsLeft(product) {
+                    return product.availableInventory - this.cartCount(product.id);
+                },
+                cartCount(id) {
+                    let count = 0;
+                    for (let i = 0; i < this.cart.length; i++) {
+                        if (this.cart[i] === id) {
+                            count++;
+                        }
+                    }
+                    return count;
+                }
+            }
+
+        });
+    </script>
+</body>
+
+</html>
