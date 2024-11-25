@@ -1,15 +1,16 @@
 {
-    "name":"My Pet Store PWA",
-    "short_name":"petstore",
-    "description":"my online pet store",
-    "icons":[{
-        "src":"images/icon-store-512.png",
-        "sizes":"512x512",
-        "type":"image/png"
-    }
-],
-
-"start_url" : "petDepot.html",
-"display":"'fullscreen",
-"background_color":"#B12A34"
+    "name": "My Pet Store PWA",
+    "short_name": "petstore",
+    "description": "My online pet store",
+    "icons": [
+        {
+            "src": "images/icon-store-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "start_url": "petDepot.html",
+    "display": "fullscreen",
+    "background_color": "#B12A34",
+    "theme_color": "#B12A34"
 }
